@@ -3,6 +3,7 @@
 package http.server;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -21,14 +22,20 @@ import java.util.Vector;
  * @version 1.0
  */
 public class WebServer {
-  ActionServlet servlet = new ActionServlet();
+  ServerSocket s;
+  Socket remote;
+  ActionServlet servlet;
+
+  public WebServer(){
+  }
+
   /**
    * WebServer constructor.
    */
   protected void start() {
-    ServerSocket s;
     System.out.println("Webserver starting up on port 4000");
     System.out.println("(press ctrl-c to exit)");
+
     try {
       // create the main server socket
       s = new ServerSocket(4000);
@@ -45,7 +52,8 @@ public class WebServer {
 
       try {
         // wait for a connection
-        Socket remote = s.accept();
+        remote = s.accept();
+        servlet = new ActionServlet(remote);
         // remote is now the connected socket
         System.out.println("Connection, sending data.");
         BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -63,10 +71,12 @@ public class WebServer {
           System.out.println(header);
           headers.add(header);
         }
-        requestType = headers.get(0).split(" ")[0];
-        System.out.println("RquestType: " + requestType);
-        requestUrl = headers.get(0).split(" ")[1];
-        System.out.println("RequestUrl: " + requestUrl);
+        if (headers != null) {
+          requestType = headers.get(0).split(" ")[0];
+          System.out.println("RquestType: " + requestType);
+          requestUrl = headers.get(0).split(" ")[1];
+          System.out.println("RequestUrl: " + requestUrl);
+        }
 
         // read the body
         String body = "the body hasn't been initialized";
@@ -84,22 +94,27 @@ public class WebServer {
         // Send the response
         switch (requestType.toUpperCase()){
           case "GET":
-            servlet.doGet(out, requestUrl);
+            servlet.doGet(requestUrl);
             break;
           case "HEAD":
-            servlet.doHead(out, requestUrl);
+            servlet.doHead(requestUrl);
             break;
           case "POST":
-            servlet.doPost(out, requestUrl, body);
+            servlet.doPost(requestUrl, body);
             break;
           case "PUT":
-            servlet.doPut(out, requestUrl, body);
+            servlet.doPut(requestUrl, body);
             break;
           case "DELETE":
-            servlet.doDelete(out, requestUrl);
+            servlet.doDelete(requestUrl);
             break;
           default:
-            System.out.println("Wrong request type");
+            out.println(servlet.makeHeader(501,"text/html"));
+            out.println("<html>");
+            out.println("<head><title>501 NOT IMPLEMENTED</title></head>");
+            out.println("<body><h1>501 NOT IMPLEMENTED</h1>");
+            out.println("<p>This http request is not implemented yet.</p></body>");
+            out.println("</html>");
         }
 
         out.flush();
