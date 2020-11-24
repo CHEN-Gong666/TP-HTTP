@@ -1,6 +1,5 @@
 package http.server;
 
-import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.servlet.http.*;
 import java.awt.image.BufferedImage;
@@ -15,9 +14,19 @@ public class ActionServlet extends HttpServlet {
         this.out = new PrintWriter(remote.getOutputStream());
     }
 
-    public void doGet(String requestUrl){
+    public void doGet(String requestUrl) throws IOException {
         String filePath = "";
-        switch (requestUrl) {
+        String requestParam = "";
+        String requestBody = "";
+        if (requestUrl.contains("?")){
+            requestBody = requestUrl.split("\\?")[0];
+            System.out.println("body: " + requestBody);
+            requestParam = requestUrl.split("\\?")[1];
+            System.out.println("param: " + requestParam);
+        } else {
+            requestBody = requestUrl;
+        }
+        switch (requestBody) {
             case "/adder.html":
                 filePath = "TP-HTTP-Code/sources/adder.html";
                 out.println(makeHeader(200, "text/html"));
@@ -57,6 +66,38 @@ public class ActionServlet extends HttpServlet {
                 out.println("<p>You access to this page is denied.</p></body>");
                 out.println("</html>");
                 break;
+            case "/multiplier.class":
+                byte[] result = new byte[256];
+                int a=0;
+                int b=0;
+                int c=0;
+                int i=0;
+                if(!requestParam.equals("")) {
+                    a = Character.getNumericValue(requestParam.split("&")[0].charAt(2));
+                    b =  Character.getNumericValue(requestParam.split("&")[1].charAt(2));
+                    System.out.println(a);
+                    System.out.println(b);
+                } else {
+                    // handle errors
+                }
+                Process process = Runtime.getRuntime().exec("java -classpath TP-HTTP-Code\\sources multiplier "+a+" "+b);
+                while( (c = process.getInputStream().read()) != -1 ){
+                    System.out.println(c);
+                    result[i] = (byte)c;
+                    ++i;
+                }
+                out.println(makeHeader(200, "text/html"));
+                System.out.println("result:" + new String (result));
+                out.println(new String (result));
+                break;
+
+            default:
+                out.println(makeHeader(404, "text/html"));
+                out.println("<html>");
+                out.println("<head><title>404 NOT FOUND</title></head>");
+                out.println("<body><h1>404 NOT FOUND</h1>");
+                out.println("<p>The URL is not recognized by the server</p></body>");
+                out.println("</html>");
         }
         out.flush();
     }
@@ -72,7 +113,8 @@ public class ActionServlet extends HttpServlet {
             out.println(makeHeader(404, "text/html"));
             out.println("<html>");
             out.println("<head><title>404 The file doesn't exist</title></head>");
-            out.println("</html>");        }
+            out.println("</html>");
+        }
         out.flush();
     }
 
@@ -91,7 +133,8 @@ public class ActionServlet extends HttpServlet {
                 out.println(makeHeader(404, "text/html"));
                 out.println("<html>");
                 out.println("<head><title>404 The file doesn't exist</title></head>");
-                out.println("</html>");               }
+                out.println("</html>");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -161,9 +204,8 @@ public class ActionServlet extends HttpServlet {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if (contentType.equals("image/png")) {
+        } /*else if (contentType.equals("image/png")) {
             try {
-                out.println("<link rel=\"icon\" href=\"data:;base64,=\">");
                 BufferedImage img = ImageIO.read(file);
                 System.out.println("img: " + img);
                 out.flush();
@@ -176,7 +218,8 @@ public class ActionServlet extends HttpServlet {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
+        } */
+         else {
             try{
                 BufferedInputStream bis = new BufferedInputStream(new FileInputStream(filePath));
                 BufferedOutputStream bos = new BufferedOutputStream(remote.getOutputStream());
@@ -195,7 +238,8 @@ public class ActionServlet extends HttpServlet {
 
     public String makeHeader(int status, String contentType){
 
-        String header = "HTTP/1.0 ";
+        String header = "";
+        header += "HTTP/1.0 ";
         if (status == 200) header += "200 OK";
         else if (status == 201) header += "201 CREATED";
         else if (status == 204) header += "204 NON CONTENT";
@@ -206,6 +250,7 @@ public class ActionServlet extends HttpServlet {
         header += "\r\n";
         header += "Content-Type: " + contentType + "\r\n";
         header += "Server: Bot\r\n";
+
         // this blank line signals the end of the headers
         header += "\r\n";
         return header;
