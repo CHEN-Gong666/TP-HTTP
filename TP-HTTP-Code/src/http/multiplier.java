@@ -1,3 +1,5 @@
+package http;
+
 public class multiplier {
     public static void main(String[] args) {
         int a = Integer.parseInt(args[0]);

@@ -15,6 +15,12 @@ public class ActionServlet extends HttpServlet {
         this.out = new PrintWriter(remote.getOutputStream());
     }
 
+    /**
+     * method which loads different element on a web page
+     * @param requestUrl String: the url of the request
+     * @throws IOException the input and output errors
+     */
+
     public void doGet(String requestUrl) throws IOException {
         String filePath = "";
         String requestParam = "";
@@ -77,7 +83,7 @@ public class ActionServlet extends HttpServlet {
                 out.println("<p>You access to this page is denied.</p></body>");
                 out.println("</html>");
                 break;
-            case "/multiplier.class":
+            case "/http.multiplier.class":
                 byte[] result = new byte[256];
                 int a=0;
                 int b=0;
@@ -91,7 +97,7 @@ public class ActionServlet extends HttpServlet {
                 } else {
                     // handle errors
                 }
-                Process process = Runtime.getRuntime().exec("java -classpath TP-HTTP-Code\\sources multiplier "+a+" "+b);
+                Process process = Runtime.getRuntime().exec("java -classpath TP-HTTP-Code\\sources http.multiplier "+a+" "+b);
                 while( (c = process.getInputStream().read()) != -1 ){
                     System.out.println(c);
                     result[i] = (byte)c;
@@ -112,7 +118,10 @@ public class ActionServlet extends HttpServlet {
         }
         out.flush();
     }
-
+    /**
+     * method which calls makeHead when knowing a request
+     * @param requestUrl String: the url of the request
+     */
     public void doHead(String requestUrl){
         // Send the headers
         String filePath = "TP-HTTP-Code/sources" + requestUrl;
@@ -129,6 +138,11 @@ public class ActionServlet extends HttpServlet {
         out.flush();
     }
 
+    /**
+     * method which posts a file on the server
+     * @param requestUrl String: the url of the request
+     * @param body the body of a web page to be written
+     */
     public void doPost(String requestUrl, String body){
         String filePath = "TP-HTTP-Code/sources" + requestUrl;
         File file = new File(filePath);
@@ -152,6 +166,11 @@ public class ActionServlet extends HttpServlet {
         out.flush();
     }
 
+    /**
+     * method which puts a file on the server
+     * @param requestUrl String: the url of the request
+     * @param body the body of a web page to be written
+     */
     public void doPut(String requestUrl, String body){
         String filePath = "TP-HTTP-Code/sources" + requestUrl;
         try {
@@ -181,6 +200,11 @@ public class ActionServlet extends HttpServlet {
         sendResponse(filePath, "text/html");
         out.flush();
     }
+
+    /**
+     * method who deletes a file on the server
+     * @param requestUrl String: the url of the request
+     */
     public void doDelete(String requestUrl){
 
         String filePath = "TP-HTTP-Code/sources" + requestUrl;
@@ -199,6 +223,11 @@ public class ActionServlet extends HttpServlet {
         out.flush();
     }
 
+    /**
+     * method that sends a response to the web
+     * @param filePath the address of a file to be opened
+     * @param contentType String: type of the file to be opened
+     */
     public void sendResponse(String filePath, String contentType) {
         final File file = new File(filePath);
 
@@ -239,6 +268,13 @@ public class ActionServlet extends HttpServlet {
         }
     }
 
+
+    /**
+     * method that make a web head
+     * @param status int: state of the server
+     * @param contentType String: type of the file to be opened
+     * @return string the read who is linked to the state of the web
+     */
     public String makeHeader(int status, String contentType){
 
         String header = "";
