@@ -12,14 +12,7 @@ import java.sql.SQLOutput;
 import java.util.Vector;
 
 /**
- * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
- * Java Copyright 2001 by Jeff Heaton
- * 
- * WebServer is a very simple web-server. Any request is responded with a very
- * simple web-page.
- * 
- * @author Jeff Heaton
- * @version 1.0
+ * class of the web server side which starts the server
  */
 public class WebServer {
   ServerSocket s;

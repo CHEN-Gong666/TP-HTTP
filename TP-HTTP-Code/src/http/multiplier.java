@@ -7,7 +7,7 @@ package http;
 public class multiplier {
     /**
      * main method of the multiplier
-     * @param args int:arg[0] the first multiply number,int:arg[0] the first multiply number
+     * @param args int:arg[0] the first multiply number,int:arg[1] the first multiply number
      */
     public static void main(String[] args) {
         int a = Integer.parseInt(args[0]);

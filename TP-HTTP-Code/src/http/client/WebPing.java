@@ -9,7 +9,7 @@ import java.net.Socket;
 public class WebPing {
     /**
      * main methode of web ping
-     * @param args arg[0] the host name, arg[2] the server port number
+     * @param args arg[0] the host name, arg[1] the server port number
      */
     public static void main(String[] args) {
 
