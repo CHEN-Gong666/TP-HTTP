@@ -26,6 +26,9 @@ public class WebServer {
   Socket remote;
   ActionServlet servlet;
 
+  /**
+   * constructor of webServer
+   */
   public WebServer(){
   }
 

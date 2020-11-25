@@ -6,9 +6,21 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * servlet on the server side
+ */
 public class ActionServlet extends HttpServlet {
+    /**
+     * socket for remote communication
+     */
     Socket remote;
+    /**
+     * output stream
+     */
     PrintWriter out;
+    /**
+     * image matrice
+     */
     byte[] imgByte;
     ActionServlet(Socket r) throws IOException {
         this.remote = r;

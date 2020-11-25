@@ -3,7 +3,14 @@ package http.client;
 import java.net.InetAddress;
 import java.net.Socket;
 
+/**
+ * the web side class
+ */
 public class WebPing {
+    /**
+     * main methode of web ping
+     * @param args arg[0] the host name, arg[2] the server port number
+     */
     public static void main(String[] args) {
 
         if (args.length != 2) {
