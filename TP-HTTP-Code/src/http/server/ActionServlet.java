@@ -9,6 +9,7 @@ import java.net.Socket;
 public class ActionServlet extends HttpServlet {
     Socket remote;
     PrintWriter out;
+    byte[] imgByte;
     ActionServlet(Socket r) throws IOException {
         this.remote = r;
         this.out = new PrintWriter(remote.getOutputStream());
@@ -41,6 +42,16 @@ public class ActionServlet extends HttpServlet {
                 break;
             case "/logo.png":
                 filePath = "TP-HTTP-Code/sources/logo.png";
+
+                BufferedImage img = ImageIO.read(new File(filePath));
+                System.out.println("img: " + img);
+                out.flush();
+                ByteArrayOutputStream pngBaos = new ByteArrayOutputStream();
+                ImageIO.write(img,"png", pngBaos);
+                pngBaos.flush();
+                imgByte = pngBaos.toByteArray();
+
+                pngBaos.close();
                 out.println(makeHeader(200, "image/png"));
                 out.flush();
                 sendResponse(filePath, "image/png");
@@ -174,7 +185,8 @@ public class ActionServlet extends HttpServlet {
 
         String filePath = "TP-HTTP-Code/sources" + requestUrl;
         File file = new File (filePath);
-        if ( !file.exists() ) {
+        System.out.println(file.isFile());
+        if ( !file.exists()) {
             out.println(makeHeader(404, "text"));
             out.println("The file doesn't exist");
         } else if (file.delete()) {
@@ -184,7 +196,6 @@ public class ActionServlet extends HttpServlet {
             out.println(makeHeader(500, "text"));
             out.println("Deletion has failed due to internal error");
         }
-
         out.flush();
     }
 
@@ -204,21 +215,13 @@ public class ActionServlet extends HttpServlet {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } /*else if (contentType.equals("image/png")) {
+        } else if (contentType.equals("image/png")) {
             try {
-                BufferedImage img = ImageIO.read(file);
-                System.out.println("img: " + img);
-                out.flush();
-                ByteArrayOutputStream pngBaos = new ByteArrayOutputStream();
-                ImageIO.write(img,"png", pngBaos);
-                pngBaos.flush();
-                byte[] imgByte = pngBaos.toByteArray();
-                remote.getOutputStream().write(imgByte);
-                pngBaos.close();
+                remote.getOutputStream().write(imgByte, 0, imgByte.length);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } */
+        }
          else {
             try{
                 BufferedInputStream bis = new BufferedInputStream(new FileInputStream(filePath));
@@ -249,6 +252,9 @@ public class ActionServlet extends HttpServlet {
         else header += "501 NOT IMPLEMENTED";
         header += "\r\n";
         header += "Content-Type: " + contentType + "\r\n";
+        if (contentType.equals("image/png")){
+            header += "Content-length: " + imgByte.length + "\r\n";
+        }
         header += "Server: Bot\r\n";
 
         // this blank line signals the end of the headers

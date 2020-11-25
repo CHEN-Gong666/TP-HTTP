@@ -71,7 +71,7 @@ public class WebServer {
           System.out.println(header);
           headers.add(header);
         }
-        if (headers != null) {
+        if (!headers.isEmpty()) {
           requestType = headers.get(0).split(" ")[0];
           System.out.println("RquestType: " + requestType);
           requestUrl = headers.get(0).split(" ")[1];
