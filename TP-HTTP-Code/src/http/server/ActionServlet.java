@@ -97,7 +97,7 @@ public class ActionServlet extends HttpServlet {
                 } else {
                     // handle errors
                 }
-                Process process = Runtime.getRuntime().exec("java -classpath TP-HTTP-Code\\sources http.multiplier "+a+" "+b);
+                Process process = Runtime.getRuntime().exec("java -classpath TP-HTTP-Code\\bin\\production\\TP-HTTP-CODE\\http\\multiplier.class "+a+" "+b);
                 while( (c = process.getInputStream().read()) != -1 ){
                     System.out.println(c);
                     result[i] = (byte)c;
